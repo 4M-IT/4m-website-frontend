@@ -2,7 +2,7 @@
 import { Layout } from '@/layouts';
 import { Breadcrumb } from '@/components';
 import NewsCard from './_components/news-card.astro';
-import { getAllNews, getRelatedNews, formatContent, formatDate } from '@/repositories/news';
+import { getAllNews, getNewsById, getRelatedNews, formatContent } from '@/repositories/news';
 import { getBase } from '@/config';
 
 export async function getStaticPaths() {
@@ -14,8 +14,13 @@ export async function getStaticPaths() {
   }));
 }
 
-const { article } = Astro.props;
 const base = getBase();
+const routeId = Astro.params.id ?? '';
+const article = Astro.props.article ?? (routeId ? await getNewsById(routeId) : null);
+
+if (!article) {
+  return Astro.redirect(`${base}/news`);
+}
 
 // Get related articles (same category, excluding current)
 const relatedArticles = await getRelatedNews(article.id, article.category, 3);
@@ -160,6 +165,14 @@ const relatedArticles = await getRelatedNews(article.id, article.category, 3);
 
   .prose h2 {
     @apply text-2xl font-bold text-gray-900 mt-8 mb-4 font-sans;
+  }
+
+  .prose h1 {
+    @apply text-3xl font-bold text-gray-900 mt-10 mb-5 font-sans;
+  }
+
+  .prose h3 {
+    @apply text-xl font-bold text-gray-900 mt-6 mb-3 font-sans;
   }
 
   .prose p {

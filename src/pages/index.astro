@@ -211,9 +211,9 @@ const pillarTextLinkClass =
           {homeAwardsPreview.map((award) => (
             <li class="grid min-w-0 grid-cols-[auto_1fr] items-start gap-3 sm:gap-4">
               <div class="flex h-11 w-11 shrink-0 items-center justify-center pt-0.5 sm:h-12 sm:w-12">
-                {award.media_source === 'file' && award.media_destination ? (
+                {award.media_destination ? (
                   <img
-                    src={`${base}/images/awards/${award.media_destination}`}
+                    src={award.media_source === 'file' ? `${base}/images/awards/${award.media_destination}` : award.media_destination}
                     alt=""
                     width="48"
                     height="48"

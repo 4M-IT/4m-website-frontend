@@ -1,0 +1,72 @@
+---
+import { Layout } from '@/layouts';
+---
+
+<Layout title="Admin Login | 4M">
+  <section class="container-custom py-12">
+    <div class="mx-auto max-w-md rounded-lg border bg-card p-6 shadow-sm">
+      <h1 class="mb-2 text-2xl font-bold">Admin Login</h1>
+      <p class="mb-6 text-sm text-muted-foreground">Use your backend user account to manage awards and news.</p>
+
+      <form id="login-form" class="space-y-4">
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium">Email</span>
+          <input id="email" type="email" required class="w-full rounded-md border px-3 py-2" />
+        </label>
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium">Password</span>
+          <input id="password" type="password" required class="w-full rounded-md border px-3 py-2" />
+        </label>
+        <button type="submit" class="w-full rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground">
+          Sign in
+        </button>
+      </form>
+      <p id="message" class="mt-4 text-sm"></p>
+    </div>
+  </section>
+
+  <script>
+    // @ts-nocheck
+    import { login, getAccessToken } from '@/services/admin-api';
+
+    function safeRedirectTarget(raw) {
+      if (!raw || typeof raw !== 'string' || raw.trim() === '') {
+        return '/admin';
+      }
+      try {
+        const u = new URL(raw.trim(), window.location.origin);
+        if (u.origin !== window.location.origin) return '/admin';
+        if (!u.pathname.startsWith('/admin')) return '/admin';
+        return `${u.pathname}${u.search}${u.hash}`;
+      } catch {
+        return '/admin';
+      }
+    }
+
+    const nextFromQuery = safeRedirectTarget(new URLSearchParams(window.location.search).get('redirect'));
+
+    if (getAccessToken()) {
+      window.location.replace(nextFromQuery);
+    }
+
+    const form = document.getElementById('login-form');
+    const message = document.getElementById('message');
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = document.getElementById('email')?.value?.trim();
+      const password = document.getElementById('password')?.value ?? '';
+
+      message.textContent = '';
+      try {
+        await login(email, password);
+        message.textContent = 'Login successful. Redirecting…';
+        message.className = 'mt-4 text-sm text-green-600';
+        window.location.href = nextFromQuery;
+      } catch (error) {
+        message.textContent = error instanceof Error ? error.message : 'Login failed';
+        message.className = 'mt-4 text-sm text-red-600';
+      }
+    });
+  </script>
+</Layout>

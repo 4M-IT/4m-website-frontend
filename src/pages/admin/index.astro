@@ -1,0 +1,22 @@
+---
+import { Layout } from '@/layouts';
+---
+
+<Layout title="Admin | 4M">
+  <section class="container-custom py-12">
+    <p class="text-sm text-muted-foreground">Loading admin…</p>
+  </section>
+  <script>
+    import { getAccessToken } from '@/services/admin-api';
+
+    const search = window.location.search || '';
+    const dest = `/admin/news${search}`;
+    const token = getAccessToken();
+
+    if (!token) {
+      window.location.replace(`/admin/login?redirect=${encodeURIComponent(dest)}`);
+    } else {
+      window.location.replace(dest);
+    }
+  </script>
+</Layout>

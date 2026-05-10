@@ -5,14 +5,26 @@
  * 1. `API_INTERNAL_URL` when set — preferred for server-side calls
  * 2. If `PUBLIC_API_URL` is relative (`/…`), resolve it against `import.meta.env.SITE` (from `site` in `astro.config`)
  * 3. Fall back to the same default origin as `src/pages/api/backend/[...path].ts`
+ *
+ * `API_INTERNAL_URL` should be the **API origin only** (no trailing `/api/v1`).
+ * Server-side `apiGetJson('/api/v1/…')` paths are built the same way as the Astro proxy.
  */
 const DEFAULT_BACKEND_ORIGIN = 'https://4m-backend-production.up.railway.app';
+
+/** Strips trailing slashes and a trailing `/api/v1` so callers can append `/api/v1/...` consistently. */
+export function normalizeBackendOrigin(raw: string): string {
+  let s = raw.trim().replace(/\/+$/, '');
+  if (s.endsWith('/api/v1')) {
+    s = s.slice(0, -'/api/v1'.length).replace(/\/+$/, '');
+  }
+  return s;
+}
 
 export function getPublicApiBaseUrl(): string {
   if (import.meta.env.SSR) {
     const internal = import.meta.env.API_INTERNAL_URL;
     if (internal && typeof internal === 'string' && internal.trim()) {
-      return internal.trim().replace(/\/$/, '');
+      return normalizeBackendOrigin(internal);
     }
 
     const publicUrl = import.meta.env.PUBLIC_API_URL;
@@ -23,12 +35,12 @@ export function getPublicApiBaseUrl(): string {
         if (site && typeof site === 'string' && site.trim()) {
           return new URL(trimmed, site.endsWith('/') ? site : `${site}/`).href.replace(/\/$/, '');
         }
-        return DEFAULT_BACKEND_ORIGIN.replace(/\/$/, '');
+        return normalizeBackendOrigin(DEFAULT_BACKEND_ORIGIN);
       }
       return trimmed;
     }
 
-    return DEFAULT_BACKEND_ORIGIN.replace(/\/$/, '');
+    return normalizeBackendOrigin(DEFAULT_BACKEND_ORIGIN);
   }
 
   const publicUrl = import.meta.env.PUBLIC_API_URL;
@@ -36,5 +48,5 @@ export function getPublicApiBaseUrl(): string {
     return publicUrl.trim().replace(/\/$/, '');
   }
 
-  return DEFAULT_BACKEND_ORIGIN.replace(/\/$/, '');
+  return normalizeBackendOrigin(DEFAULT_BACKEND_ORIGIN);
 }

@@ -48,13 +48,30 @@ export function formatDate(dateString: string): string {
 }
 
 export function formatContent(content: string): string {
+  const escapeHtml = (value: string): string => value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+
+  const renderInline = (value: string): string => escapeHtml(value).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
   return content
-    .split('\n\n')
-    .map((paragraph) => {
-      if (paragraph.startsWith('## ')) {
-        return `<h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4 font-fredoka">${paragraph.replace('## ', '')}</h2>`;
+    .split(/\n{2,}/)
+    .map((block) => {
+      const paragraph = block.trim();
+      if (!paragraph) return '';
+      if (paragraph.startsWith('### ')) {
+        return `<h3 class="text-xl font-bold text-gray-900 mt-6 mb-3 font-fredoka">${renderInline(paragraph.replace('### ', ''))}</h3>`;
       }
-      return `<p class="mb-6 leading-relaxed text-gray-700">${paragraph}</p>`;
+      if (paragraph.startsWith('## ')) {
+        return `<h2 class="text-2xl font-bold text-gray-900 mt-8 mb-4 font-fredoka">${renderInline(paragraph.replace('## ', ''))}</h2>`;
+      }
+      if (paragraph.startsWith('# ')) {
+        return `<h1 class="text-3xl font-bold text-gray-900 mt-10 mb-5 font-fredoka">${renderInline(paragraph.replace('# ', ''))}</h1>`;
+      }
+      return `<p class="mb-6 leading-relaxed text-gray-700">${renderInline(paragraph).replace(/\n/g, '<br />')}</p>`;
     })
     .join('');
 }
