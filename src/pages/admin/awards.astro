@@ -1,22 +1,13 @@
 ---
-import { Layout } from '@/layouts';
+import { AdminLayout } from '@/layouts';
 ---
 
-<Layout title="Admin Awards | 4M">
-  <section class="container-custom py-10">
-    <div class="mx-auto max-w-xl rounded-lg border bg-card p-6">
-      <h1 class="text-2xl font-bold">Admin Console Moved</h1>
-      <p class="mt-2 text-sm text-muted-foreground">
-        Awards management is now inside the unified admin console tab view.
-      </p>
-      <a href="/admin?tab=awards" class="mt-4 inline-flex rounded-md border px-4 py-2 text-sm font-medium">
-        Open Awards Tab
-      </a>
-    </div>
+<AdminLayout title="Admin Awards | 4M">
+  <section class="container-custom py-12">
+    <p class="text-sm text-muted-foreground">Redirecting…</p>
   </section>
-
   <script>
-    // @ts-nocheck
-    window.location.replace('/admin?tab=awards');
+    const search = window.location.search || '';
+    window.location.replace(`/admin/dashboard${search}`);
   </script>
-</Layout>
+</AdminLayout>

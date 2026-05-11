@@ -1,8 +1,8 @@
 ---
-import { Layout } from '@/layouts';
+import { AdminLayout } from '@/layouts';
 ---
 
-<Layout title="Admin Login | 4M">
+<AdminLayout title="Admin Login | 4M">
   <section class="container-custom py-12">
     <div class="mx-auto max-w-md rounded-lg border bg-card p-6 shadow-sm">
       <h1 class="mb-2 text-2xl font-bold">Admin Login</h1>
@@ -31,15 +31,15 @@ import { Layout } from '@/layouts';
 
     function safeRedirectTarget(raw) {
       if (!raw || typeof raw !== 'string' || raw.trim() === '') {
-        return '/admin';
+        return '/admin/dashboard';
       }
       try {
         const u = new URL(raw.trim(), window.location.origin);
-        if (u.origin !== window.location.origin) return '/admin';
-        if (!u.pathname.startsWith('/admin')) return '/admin';
+        if (u.origin !== window.location.origin) return '/admin/dashboard';
+        if (!u.pathname.startsWith('/admin')) return '/admin/dashboard';
         return `${u.pathname}${u.search}${u.hash}`;
       } catch {
-        return '/admin';
+        return '/admin/dashboard';
       }
     }
 
@@ -69,4 +69,4 @@ import { Layout } from '@/layouts';
       }
     });
   </script>
-</Layout>
+</AdminLayout>
